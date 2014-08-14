@@ -1,5 +1,9 @@
-var xjs = (function() {
+// Note: whenReady() function is copied from
+// "Java-Script: The Definitive Guide", by David Flanagan (O’Reilly).
+// Copyright 2011 David Flanagan, 978-0-596-80552-4.
 
+var xjs = (function() {
+  
   // This function returns the whenReady() function
   var _whenReady = (function() {
     var d = document, w = window;
