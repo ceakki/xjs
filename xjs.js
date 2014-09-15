@@ -1,5 +1,7 @@
+"use strict";
+
 // Note: whenReady() function is copied from
-// "Java-Script: The Definitive Guide", by David Flanagan (O’Reilly).
+// "Java-Script: The Definitive Guide", by David Flanagan (O'Reilly).
 // Copyright 2011 David Flanagan, 978-0-596-80552-4.
 
 var xjs = (function() {
@@ -18,18 +20,22 @@ var xjs = (function() {
     function handler(e) {
       
       // If we've already run once, just return
-      if(ready) return;
+      if(ready) {
+        return;
+      }
       
       // If this was a readystatechange event where the state changed to
       // something other than "complete", then we're not ready yet
-      if(e.type === "readystatechange" && document.readyState !== "complete")
+      if(e.type === "readystatechange" && document.readyState !== "complete") {
         return;
+      }
       
       // Run all registered functions.
       // Note that we look up funcs.length each time, in case calling
       // one of these functions causes more functions to be registered.
-      for(var i = 0; i < funcs.length; i++)
+      for(var i = 0; i < funcs.length; i++) {
         funcs[i].call(document);
+      }
       
       // Now set the ready flag to true and forget the functions
       ready = true;
@@ -51,10 +57,14 @@ var xjs = (function() {
     return function whenReady(f) {
       
       // If already ready, just run it
-      if(ready) f.call(document);
+      if(ready) {
+        f.call(document);
+      }
       
       // Otherwise, queue it for later.
-      else funcs.push(f);
+      else {
+        funcs.push(f);
+      }
     };
   }()),
   
@@ -65,22 +75,26 @@ var xjs = (function() {
   _addEventListener = function(type, listener) {
     var self = this;
     var wrapper = function(e) {
-      if(!e) e = window.event;
+      if(!e) {
+        e = window.event;
+      }
     
       e.target = e.srcElement;
       e.currentTarget = self;
       
-      if(!e.preventDefault)
+      if(!e.preventDefault) {
         e.preventDefault = function() {
           this.returnValue = false;
           return false;
         };
+      }
       
-      if(!e.stopPropagation)
+      if(!e.stopPropagation) {
         e.stopPropagation = function() {
           this.cancelBubble = true;
           return false;
         };
+      }
       
       if(listener.handleEvent) {
         listener.handleEvent(e);
@@ -117,27 +131,32 @@ var xjs = (function() {
   
   // This Function returns a static list of elements having a given className
   _getElementsByClassName = function(obj, className) {
-    if(obj === null)
+    if(obj === null) {
       return [];
+    }
       
-    if(typeof(obj.querySelectorAll) == "function")
+    if(typeof(obj.querySelectorAll) == "function") {
       return obj.querySelectorAll("." + className);
+    }
     
     var ret = [], i, len;
   
     if(typeof(obj.getElementsByClassName) == "function") {
       var objs = obj.getElementsByClassName(className);
-      for(i = 0, len = objs.length; i < len; i++)
+      for(i = 0, len = objs.length; i < len; i++) {
         ret[i] = objs[i];
+      }
         
       return ret;
     }
       
     var elements = obj.getElementsByTagName("*"), 
         regexp = new RegExp("\\s" + className + "\\s", "gi");
-    for(i = 0, len = elements.length; i < len; i++)
-      if(elements[i].className.search(regexp) > -1)
+    for(i = 0, len = elements.length; i < len; i++) {
+      if(elements[i].className.search(regexp) > -1) {
         ret.push(elements[i]);
+      }
+    }
     
     return ret;
   },
@@ -146,8 +165,9 @@ var xjs = (function() {
   // This Function add compatibility for older browsers for Array.prototype.indexOf 
   // without changing the prototype
   _indexOf = function(array, searchElement, fromIndex) {
-    if(typeof(Array.prototype.indexOf) === "function") 
+    if(typeof(Array.prototype.indexOf) === "function") {
       return array.indexOf(searchElement, fromIndex);
+    }
       
     if(array === null) {
       throw new TypeError();
@@ -162,7 +182,7 @@ var xjs = (function() {
     n = 0;
     if(arguments.length > 2) {
       n = Number(arguments[2]);
-      if(n != n) { // shortcut for verifying if it's NaN
+      if(!isNaN(n)) {
         n = 0;
       } else if(n !== 0 && n != Infinity && n != -Infinity) {
         n = (n > 0 || -1) * Math.floor(Math.abs(n));
@@ -181,37 +201,45 @@ var xjs = (function() {
   
   // Add compatibility to older browsers for Array.prototype.map()
   _map = function(array, callback) {
-    if(typeof(Array.prototype.map) === "function")
+    if(typeof(Array.prototype.map) === "function") {
       return array.map(callback);
+    }
       
     var results = [];
-    for(var i = 0, len = array.length; i < len; i++)
-      if(i in array) results[i] = callback.call(null, array[i], i, array);
+    for(var i = 0, len = array.length; i < len; i++) {
+      if(i in array) {
+        results[i] = callback.call(null, array[i], i, array);
+      }
+    }
       
     return results;
   },
   
   _filter = function(array, callback) {
   
-    if(typeof(Array.prototype.filter) === "function")
+    if(typeof(Array.prototype.filter) === "function") {
       return array.filter(callback);
+    }
 
-    if(array === void 0 || array === null)
+    if(array === undefined || array === null) {
       throw new TypeError();
+    }
 
     var t = Object(array);
     var len = (t.length ? t.length : 0);
-    if(typeof(callback) != "function")
+    if(typeof(callback) != "function") {
       throw new TypeError();
+    }
 
     var res = [];
-    var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+    var thisArg = arguments.length >= 2 ? arguments[1] : undefined;
     for(var i = 0; i < len; i++) {
       if(i in t) {
         var val = t[i];
         
-        if(callback.call(thisArg, val, i, t))
+        if(callback.call(thisArg, val, i, t)) {
           res.push(val);
+        }
       }
     }
 
@@ -220,11 +248,13 @@ var xjs = (function() {
   
   // 
   _size = function(arrayObject) {
-    if(Object.keys)
+    if(Object.keys) {
       return Object.keys(arrayObject).length;
+    }
     
-    if(typeof arrayObject != "object")
+    if(typeof arrayObject != "object") {
       return false;
+    }
       
     var i, count = 0;
     for(i in arrayObject) {
@@ -238,8 +268,9 @@ var xjs = (function() {
   
   // Add compatibility to older browsers for String.prototype.trim()
   _trim = function(string) {
-    if(typeof(String.prototype.trim) === "function")
+    if(typeof(String.prototype.trim) === "function") {
       return string.trim();
+    }
       
     return string.replace(/^\s+/g, "").replace(/\s+$/g, "");
   },
@@ -300,9 +331,8 @@ var xjs = (function() {
         part += this.eol;
         part += value.getAsBinary() + this.eol;
     } else if(typeof(value) === typeof(HTMLInputElement)) {
-      if(value.type == 'file') {
-        // Unsupported
-      } else {
+      // File Type is Unsupported
+      if(value.type != 'file') {
         part = "Content-Disposition: form-data; name=\"" + key + "\"" + this.eol;
         part += "Content-Type: text/plain; charset=utf-8" + this.eol;
         part += this.eol;
@@ -342,7 +372,9 @@ var xjs = (function() {
   
   // This functions handles an AJAX request
   _ajax = function(url, type, data, callback_ok, callback_err, need_queue) {
-    if(!need_queue) need_queue = false;
+    if(!need_queue) {
+      need_queue = false;
+    }
     
     if(_ajax_busy && need_queue) {
     
@@ -358,16 +390,18 @@ var xjs = (function() {
         req.onreadystatechange = function() {
           if(req.readyState == 4) {
             if(req.status == 200) {
-              if(callback_ok !== null)
+              if(callback_ok !== null) {
                 setTimeout(function() { 
                   callback_ok.call(window, req.responseText, _ajax_queue.length > 0); 
                 }, 0);
-              } else {
-                if(callback_err !== null)
-                  setTimeout(function() { 
-                    callback_err.call(window, req.statusText, _ajax_queue.length > 0); 
-                  }, 0);
               }
+            } else {
+              if(callback_err !== null) {
+                setTimeout(function() { 
+                  callback_err.call(window, req.statusText, _ajax_queue.length > 0); 
+                }, 0);
+              }
+            }
             
             _ajax_busy = false;
             if(_ajax_queue.length > 0) {
@@ -381,15 +415,18 @@ var xjs = (function() {
         if(t == "post") {
           req.open("POST", url, true);
           
-          if(typeof(data) != "object")
+          if(typeof(data) != "object") {
             req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-          else if(typeof(data.contentType) != "undefined")
+          }
+          else if(typeof(data.contentType) != "undefined") {
             req.setRequestHeader("Content-type", data.contentType);
+          }
           
-          if(typeof(data) == "object" && typeof(data.buildBody) == "function")
+          if(typeof(data) == "object" && typeof(data.buildBody) == "function") {
             req.send(data.buildBody());
-          else
+          } else {
             req.send(data);
+          }
         
         } else if(t == "get") {
           req.open("GET", url + (data === "" ? "" : "?" + data), true);
@@ -420,16 +457,18 @@ var xjs = (function() {
         c_value = d.cookie, 
         c_start = c_value.indexOf(" " + c_name + "=");
     
-    if(c_start == -1)
+    if(c_start == -1) {
       c_start = c_value.indexOf(c_name + "=");
+    }
     
-    if(c_start == -1) 
+    if(c_start == -1) {
       c_value = null;
-    else {
+    } else {
       c_start = c_value.indexOf("=", c_start) + 1;
       var c_end = c_value.indexOf(";", c_start);
-      if(c_end == -1)
+      if(c_end == -1) {
         c_end = c_value.length;
+      }
       
       c_value = unescape(c_value.substring(c_start, c_end));
     }
@@ -463,8 +502,12 @@ var xjs = (function() {
   // Check if an HTML object has the given class name
   _hasClass = function(obj, className) {
     var classes = obj.className;
-    if(!classes) return false;
-    if(classes === className) return true;
+    if(!classes) {
+      return false;
+    }
+    if(classes === className) { 
+      return true;
+    }
     return (classes.search("\\b" + className + "\\b") != -1);
   },
   
@@ -472,22 +515,27 @@ var xjs = (function() {
   // This function extends a DOM Element / DOM Node (not the prototype)
   _extend = function(objs) {
   
-    if(typeof(objs.isVisible) == "function")
+    if(typeof(objs.isVisible) == "function") {
       return objs;
+    }
   
     objs.isVisible = function() {
       var list = this, list_len = list.length;
       
-      if(list_len > 0)
-        for(var i = 0; i < list_len; i++)
+      if(list_len > 0) {
+        for(var i = 0; i < list_len; i++) {
           if((list[i].offsetHeight > 0 && list[i].offsetWidth > 0) ||
               (list[i].style.display && list[i].style.display.toLowerCase() != "none")) {
-            if(!list[i].style.visibility)
+            if(!list[i].style.visibility) {
               return true;
+            }
               
-            if(list[i].style.visibility && list[i].style.visibility.toLowerCase() != "hidden")
+            if(list[i].style.visibility && list[i].style.visibility.toLowerCase() != "hidden") {
               return true;
+            }
           }
+        }
+      }
       
       return false;
     };
@@ -497,8 +545,9 @@ var xjs = (function() {
       
       if(list_len > 0) {
       
-        for(var i = 0; i < list_len; i++)
+        for(var i = 0; i < list_len; i++) {
           list[i].style.display = "none";
+        }
       }
       
       return list;
@@ -509,8 +558,9 @@ var xjs = (function() {
       
       if(list_len > 0) {
       
-        for(var i = 0; i < list_len; i++)
+        for(var i = 0; i < list_len; i++) {
           list[i].style.display = "block";
+        }
       }
       
       return list;
@@ -521,8 +571,9 @@ var xjs = (function() {
       
       if(list_len > 0) {
         var regex  = new RegExp("\\b" + className + "\\b\\s*", "g");
-        for(var i = 0; i < list_len; i++)
+        for(var i = 0; i < list_len; i++) {
           list[i].className = _trim(list[i].className.replace(regex, ""));
+        }
       
       }
       return list;
@@ -531,17 +582,20 @@ var xjs = (function() {
     objs.addClass = function(className) {
       
       var list = this, list_len = list.length;
-      if(list_len > 0)
+      if(list_len > 0) {
         for(var i = 0; i < list_len; i++) {
-          if(_hasClass(list[i], className))
+          if(_hasClass(list[i], className)) {
             return list;
+          }
           
           var classes = list[i].className;
-          if(classes && classes[classes.length - 1] != " ")
+          if(classes && classes[classes.length - 1] != " ") {
             list[i].className += " " + className;
-          else
+          } else {
             list[i].className += className;
+          }
         }
+      }
         
       return list;
     };
@@ -549,10 +603,13 @@ var xjs = (function() {
     objs.hasClass = function(className) {
       
       var list = this, list_len = list.length;
-      if(list_len > 0)
-        for(var i = 0; i < list_len; i++)
-          if(_hasClass(list[i], className))
+      if(list_len > 0) {
+        for(var i = 0; i < list_len; i++) {
+          if(_hasClass(list[i], className)) {
             return true;
+          }
+        }
+      }
         
       return false;
     };
@@ -565,8 +622,9 @@ var xjs = (function() {
         for(var i = 0; i < list_len; i++) {
           var obj = list[i];
            
-          if(!obj.addEventListener)
+          if(!obj.addEventListener) {
             obj.addEventListener = _addEventListener;
+          }
           
           obj.addEventListener(evt, callback, false);
         }
@@ -583,8 +641,9 @@ var xjs = (function() {
         for(var i = 0; i < list_len; i++) {
           var obj = list[i];
            
-          if(!obj.removeEventListener)
+          if(!obj.removeEventListener) {
             obj.removeEventListener = _removeEventListener;
+          }
           
           obj.removeEventListener(evt, callback);
         }
@@ -596,12 +655,15 @@ var xjs = (function() {
     objs.html = function(html) {
       var list = this, list_len = list.length;
     
-      if(list_len > 0)
-        if(typeof(html) != "string")
+      if(list_len > 0) {
+        if(typeof(html) != "string") {
           return list[0].innerHTML;
-        else
-          for(var i = 0; i < list_len; i++)
+        } else {
+          for(var i = 0; i < list_len; i++) {
             list[i].innerHTML = html;
+          }
+        }
+      }
         
       return list;
     };
@@ -609,12 +671,15 @@ var xjs = (function() {
     objs.attr = function(name, value) {
       var list = this, list_len = list.length;
       
-      if(list_len > 0)
-        if(typeof(value) == "undefined")
+      if(list_len > 0) {
+        if(typeof(value) == "undefined") {
           return list[0].getAttribute(name);
-        else
-          for(var i = 0; i < list_len; i++)
+        } else {
+          for(var i = 0; i < list_len; i++) {
             list[i].setAttribute(name, value);
+          }
+        }
+      }
       
       return list;
     };
@@ -622,12 +687,15 @@ var xjs = (function() {
     objs.css = function(name, value) {
       var list = this, list_len = list.length;
       
-      if(list_len > 0)
-        if(typeof(value) == "undefined")
+      if(list_len > 0) {
+        if(typeof(value) == "undefined") {
           return list[0].style[name];
-        else
-          for(var i = 0; i < list_len; i++)
+        } else {
+          for(var i = 0; i < list_len; i++) {
             list[i].style[name] = value;
+          }
+        }
+      }
       
       return list;
     };
@@ -635,9 +703,11 @@ var xjs = (function() {
     objs.removeAttr = function(name) {
       var list = this, list_len = list.length;
       
-      if(list_len > 0)
-        for(var i = 0; i < list_len; i++)
+      if(list_len > 0) {
+        for(var i = 0; i < list_len; i++) {
           list[i].removeAttribute(name);
+        }
+      }
       
       return list;
     };
@@ -645,10 +715,13 @@ var xjs = (function() {
     objs.append = function(el) {
       var list = this, list_len = list.length, el_len = el.length;
       
-      if(list_len > 0 && el_len > 0)
-        for(var i = 0; i < list_len; i++)
-          for(var j = 0; j < el_len; j++)
+      if(list_len > 0 && el_len > 0) {
+        for(var i = 0; i < list_len; i++) {
+          for(var j = 0; j < el_len; j++) {
             list[i].appendChild(el[j]);
+          }
+        }
+      }
       
       return list;
     };
@@ -656,10 +729,13 @@ var xjs = (function() {
     objs.after = function(el) {
       var list = this, list_len = list.length, el_len = el.length;
       
-      if(list_len > 0 && el_len > 0)
-        for(var i = 0; i < list_len; i++)
-          for(var j = 0; j < el_len; j++)
+      if(list_len > 0 && el_len > 0) {
+        for(var i = 0; i < list_len; i++) {
+          for(var j = 0; j < el_len; j++) {
             list[i].parentNode.insertBefore(el[j], list[i].nextSibling);
+          }
+        }
+      }
       
       return list;
     };
@@ -667,10 +743,13 @@ var xjs = (function() {
     objs.before = function(el) {
       var list = this, list_len = list.length, el_len = el.length;
       
-      if(list_len > 0 && el_len > 0)
-        for(var i = 0; i < list_len; i++)
-          for(var j = 0; j < el_len; j++)
+      if(list_len > 0 && el_len > 0) {
+        for(var i = 0; i < list_len; i++) {
+          for(var j = 0; j < el_len; j++) {
             list[i].parentNode.insertBefore(el[j], list[i]);
+          }
+        }
+      }
       
       return list;
     };
@@ -678,10 +757,13 @@ var xjs = (function() {
     objs.remove = function(el) {
       var list = this, list_len = list.length, el_len = el.length;
       
-      if(list_len > 0 && el_len > 0)
-        for(var i = 0; i < list_len; i++)
-          for(var j = 0; j < el_len; j++)
+      if(list_len > 0 && el_len > 0) {
+        for(var i = 0; i < list_len; i++) {
+          for(var j = 0; j < el_len; j++) {
             list[i].removeChild(el[j]);
+          }
+        }
+      }
             
       return list;
     };
@@ -689,13 +771,15 @@ var xjs = (function() {
     objs.left = function(pos) {
       var list = this, list_len = list.length;
         
-      if(list_len > 0)
-        if(typeof(pos) != "number")
+      if(list_len > 0) {
+        if(typeof(pos) != "number") {
           return 0;
-        else
-          for(var i = 0; i < list_len; i++)
+        } else {
+          for(var i = 0; i < list_len; i++) {
             list[i].style.left = pos + "px";
-       
+          }
+        }
+      }
 
       return list;
     };
@@ -703,13 +787,15 @@ var xjs = (function() {
     objs.top = function(pos) {
       var list = this, list_len = list.length;
         
-      if(list_len > 0)
-        if(typeof(pos) != "number")
+      if(list_len > 0) {
+        if(typeof(pos) != "number") {
           return 0;
-        else
-          for(var i = 0; i < list_len; i++)
+        } else {
+          for(var i = 0; i < list_len; i++) {
             list[i].style.top = pos + "px";
-       
+          }
+        } 
+      }
 
       return list;
     };
@@ -717,13 +803,15 @@ var xjs = (function() {
     objs.width = function(pos) {
       var list = this, list_len = list.length;
         
-      if(list_len > 0)
-        if(typeof(pos) != "number")
+      if(list_len > 0) {
+        if(typeof(pos) != "number") {
           return 0;
-        else
-          for(var i = 0; i < list_len; i++)
+        } else {
+          for(var i = 0; i < list_len; i++) {
             list[i].style.width = pos + "px";
-       
+          }
+        }
+      }
 
       return list;
     };
@@ -731,24 +819,29 @@ var xjs = (function() {
     objs.height = function(pos) {
       var list = this, list_len = list.length;
         
-      if(list_len > 0)
-        if(typeof(pos) != "number")
+      if(list_len > 0) {
+        if(typeof(pos) != "number") {
           return 0;
-        else
-          for(var i = 0; i < list_len; i++)
+        } else {
+          for(var i = 0; i < list_len; i++) {
             list[i].style.height = pos + "px";
-       
-
+          }
+        }
+      }
+      
       return list;
     };
     
     objs.parent = function() {
       var list = this, list_len = list.length;
         
-      if(list_len > 0)
-        for(var i = 0; i < list_len; i++)
-          if(list[i].parentNode)
+      if(list_len > 0) {
+        for(var i = 0; i < list_len; i++) {
+          if(list[i].parentNode) {
             return _extend([list[i].parentNode]);
+          }
+        }
+      }
       
       return _extend([document.body]);
     };
@@ -756,12 +849,15 @@ var xjs = (function() {
     objs.val = function(value) {
       var list = this, list_len = list.length;
         
-      if(list_len > 0)
-        if(typeof(value) != "string")
+      if(list_len > 0) {
+        if(typeof(value) != "string") {
           return list[0].value ? list[0].value : "";
-        else
-          for(var i = 0; i < list_len; i++)
+        } else {
+          for(var i = 0; i < list_len; i++) {
             list[i].value = value;
+          }
+        }
+      }
       
       return list;
     };
@@ -772,7 +868,9 @@ var xjs = (function() {
   
   // This function gets a DOM element by its ID or class or tag name and extends it
   _selector = function(args, parent) {
-    if(!parent) parent = document;
+    if(!parent) {
+      parent = document;
+    }
   
     if(typeof(args) == "string") {
       
@@ -782,9 +880,9 @@ var xjs = (function() {
         
           var o = parent.getElementById(args.substr(1));
           
-          if(o !== null)
+          if(o !== null) {
             return _extend([o]);
-          
+          }
           break;
         
         case ".":
@@ -814,8 +912,9 @@ var xjs = (function() {
   },
   
   _$ = function(args) {
-    if(typeof(document.querySelector) == "function")
+    if(typeof(document.querySelector) == "function") {
       return document.querySelector(args);
+    }
       
     return _querySelector(args);
   },
@@ -848,34 +947,35 @@ var xjs = (function() {
   
   // This function implements the xjs AJAX request
   _xjsAjax = function(params) {
-    if(typeof(params) != "object")
+    if(typeof(params) != "object") {
       return false;
+    }
   
-    if(!("url" in params))
+    if(!("url" in params)) {
       return false;
+    }
     
-    if(!("type" in params))
+    if(!("type" in params)) {
       return false;
+    }
       
-    if(!("data" in params))
+    if(!("data" in params)) {
       params.data = "";
+    }
       
-    if(!("success" in params))
+    if(!("success" in params)) {
       params.success = null;
+    }
     
-    if(!("error" in params))
+    if(!("error" in params)) {
       params.error = null;
+    }
       
-    if(!("queue" in params))
+    if(!("queue" in params)) {
       params.queue = false;
+    }
   
-    return _ajax(params.url, 
-                  params.type, 
-                  params.data, 
-                  params.success, 
-                  params.error, 
-                  params.queue
-                );
+    return _ajax(params.url, params.type, params.data, params.success, params.error, params.queue);
   };
 
   
