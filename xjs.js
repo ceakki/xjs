@@ -1,12 +1,18 @@
-"use strict";
-
-// Note: whenReady() function is copied from
-// "Java-Script: The Definitive Guide", by David Flanagan (O'Reilly).
-// Copyright 2011 David Flanagan, 978-0-596-80552-4.
+/**
+ *
+ * XJS - A very small JavaScript Library
+ *
+ */
 
 var xjs = (function() {
+
+  "use strict";
   
+
   // This function returns the whenReady() function
+  // Note: whenReady() is copied from
+  // "Java-Script: The Definitive Guide", by David Flanagan (O'Reilly).
+  // Copyright 2011 David Flanagan, 978-0-596-80552-4.
   var _whenReady = (function() {
     var d = document, w = window,
     
@@ -134,10 +140,12 @@ var xjs = (function() {
     if(obj === null) {
       return [];
     }
-      
+
+/*    
     if(typeof(obj.querySelectorAll) == "function") {
       return obj.querySelectorAll("." + className);
-    }
+    }    
+*/    
     
     var ret = [], i, len;
   
@@ -371,14 +379,14 @@ var xjs = (function() {
 
   
   // This functions handles an AJAX request
-  _ajax = function(url, type, data, callback_ok, callback_err, need_queue) {
+  _ajax = function(url, type, data, callback_ok, callback_err, callback_progress, callback_loadend, need_queue) {
     if(!need_queue) {
       need_queue = false;
     }
     
     if(_ajax_busy && need_queue) {
     
-      _ajax_queue.push([url, type, data, callback_ok, callback_err]);
+      _ajax_queue.push([url, type, data, callback_ok, callback_err, callback_progress, callback_loadend]);
     
     } else {
     
@@ -407,8 +415,22 @@ var xjs = (function() {
             if(_ajax_queue.length > 0) {
               var params = _ajax_queue[0];
               _ajax_queue.splice(0,1);
-              _ajax(params[0], params[1], params[2], params[3], params[4], false);
+              _ajax(params[0], params[1], params[2], params[3], params[4], params[5], params[6], false);
             }
+          }
+        };
+        
+        req.upload.onprogress = function(pe) {
+          if(pe.lengthComputable) {
+            if(callback_progress) {
+              callback_progress.call(window, pe);
+            }
+          }
+        };
+        
+        req.upload.onloadend = function(pe) {
+          if(callback_loadend) {
+            callback_loadend.call(window, pe);
           }
         };
       
@@ -912,10 +934,6 @@ var xjs = (function() {
   },
   
   _$ = function(args) {
-    if(typeof(document.querySelector) == "function") {
-      return document.querySelector(args);
-    }
-      
     return _querySelector(args);
   },
   
@@ -970,12 +988,20 @@ var xjs = (function() {
     if(!("error" in params)) {
       params.error = null;
     }
+    
+    if(!"progress" in params) {
+      params.progress = null;
+    }
+      
+    if(!"loaded" in params) {
+      params.loaded = null;
+    }
       
     if(!("queue" in params)) {
       params.queue = false;
     }
   
-    return _ajax(params.url, params.type, params.data, params.success, params.error, params.queue);
+    return _ajax(params.url, params.type, params.data, params.success, params.error, params.progress, params.loaded, params.queue);
   };
 
   
@@ -992,7 +1018,7 @@ var xjs = (function() {
     filter         : _filter,
     size           : _size,
     ajax           : _xjsAjax,
-    FormData       : _FormData,
+    FormData       : (typeof(window.FormData) === 'undefined' ? _FormData : window.FormData),
     setCookie      : _setCookie,
     getCookie      : _getCookie,
     getQueryString : _getQueryString
