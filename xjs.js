@@ -888,53 +888,56 @@ var xjs = (function() {
   },
 
   
-  // This function gets a DOM element by its ID or class or tag name and extends it
-  _selector = function(args, parent) {
+  // This function gets a DOM element by its ID or class or tag name and extends it.
+  _$ = function(args, parent) {
+    var found, ret, i, ii;
+    
     if(!parent) {
       parent = document;
     }
-  
+    
     if(typeof(args) == "string") {
+  
+      args = _trim(args).replace(/\s+/g, " ").split(" ");
+    
+      for(i = 0, ii = args.length; i < ii; i++) {
+        found = [];
       
-      switch(args.substr(0, 1)) {
+        switch(args[i].substr(0, 1)) {
         
-        case "#":
-        
-          var o = parent.getElementById(args.substr(1));
+          case "#":
           
-          if(o !== null) {
-            return _extend([o]);
-          }
+            var o = parent.getElementById(args[i].substr(1));
+            
+            if(o !== null) {
+              found = [o];
+            }
+            break;
+          
+          case ".":
+            found = _getElementsByClassName(parent, args[i].substr(1));
+            break;
+            
+          default:
+            found = parent.getElementsByTagName(args[i]);
+        }
+        
+        if(found.length < 1) {
           break;
+        }
         
-        case ".":
-          return _extend(_getElementsByClassName(parent, args.substr(1)));
-          
-        default:
-          return _extend(parent.getElementsByTagName(args));
+        parent = found[0];
       }
       
+      ret = _extend(found);
+    
     } else if(typeof(args) == "object") {
-      return _extend([args]);
+      ret = _extend([args]);
+    } else {
+      ret = _extend([]);
     }
     
-    return _extend([]);
-  },
-
-  _querySelector = function(args) {
-    args = _trim(args).replace(/\s+/g, " ").split(" ");
-    
-    var i, ii = args.length, ext, parent = document;
-    for(i = 0; i < ii; i++) {
-      ext = _selector(args[i], parent);
-      parent = ext[0];
-    }
-    
-    return ext;
-  },
-  
-  _$ = function(args) {
-    return _querySelector(args);
+    return ret;
   },
   
   
