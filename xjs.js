@@ -795,7 +795,8 @@ var xjs = (function() {
         
       if(list_len > 0) {
         if(typeof(pos) != "number") {
-          return 0;
+          var rect = list[0].getBoundingClientRect();
+          return rect.left;
         } else {
           for(var i = 0; i < list_len; i++) {
             list[i].style.left = pos + "px";
@@ -811,7 +812,8 @@ var xjs = (function() {
         
       if(list_len > 0) {
         if(typeof(pos) != "number") {
-          return 0;
+          var rect = list[0].getBoundingClientRect();
+          return rect.top;
         } else {
           for(var i = 0; i < list_len; i++) {
             list[i].style.top = pos + "px";
@@ -822,12 +824,46 @@ var xjs = (function() {
       return list;
     };
     
+    objs.right = function(pos) {
+      var list = this, list_len = list.length;
+        
+      if(list_len > 0) {
+        if(typeof(pos) != "number") {
+          var rect = list[0].getBoundingClientRect();
+          return rect.right;
+        } else {
+          for(var i = 0; i < list_len; i++) {
+            list[i].style.right = pos + "px";
+          }
+        }
+      }
+
+      return list;
+    };
+    
+    objs.bottom = function(pos) {
+      var list = this, list_len = list.length;
+        
+      if(list_len > 0) {
+        if(typeof(pos) != "number") {
+          var rect = list[0].getBoundingClientRect();
+          return rect.bottom;
+        } else {
+          for(var i = 0; i < list_len; i++) {
+            list[i].style.bottom = pos + "px";
+          }
+        }
+      }
+
+      return list;
+    };
+    
     objs.width = function(pos) {
       var list = this, list_len = list.length;
         
       if(list_len > 0) {
         if(typeof(pos) != "number") {
-          return 0;
+          return list[0].clientWidth;
         } else {
           for(var i = 0; i < list_len; i++) {
             list[i].style.width = pos + "px";
@@ -843,7 +879,7 @@ var xjs = (function() {
         
       if(list_len > 0) {
         if(typeof(pos) != "number") {
-          return 0;
+          return list[0].clientHeight;
         } else {
           for(var i = 0; i < list_len; i++) {
             list[i].style.height = pos + "px";
