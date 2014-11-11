@@ -223,6 +223,7 @@ var xjs = (function() {
     return results;
   },
   
+  // Add compatibility to older browsers for Array.prototype.filter()
   _filter = function(array, callback) {
   
     if(typeof(Array.prototype.filter) === "function") {
@@ -254,7 +255,7 @@ var xjs = (function() {
     return res;
   },
   
-  // 
+  // Get size of an Array like Object
   _size = function(arrayObject) {
     if(Object.keys) {
       return Object.keys(arrayObject).length;
