@@ -283,6 +283,25 @@ var xjs = (function() {
     return string.replace(/^\s+/g, "").replace(/\s+$/g, "");
   },
   
+  // Add compatibility to older browsers for Object.keys()
+  _keys = function(obj) {
+    if(obj === undefined || obj === null) {
+      return undefined;
+    }
+    
+    if(typeof(Object.keys) === "function") {
+      return Object.keys(obj);
+    }
+    
+    var keys = [];
+    for(var key in obj) {
+      if(obj.hasOwnProperty(key)) {
+        keys.push(key);
+      }
+    }
+    return keys;
+  },
+  
   // Add compatibility to older browsers for FormData()
   _FormData = function(form) {
     this.fields = {};
@@ -795,8 +814,7 @@ var xjs = (function() {
         
       if(list_len > 0) {
         if(typeof(pos) != "number") {
-          var rect = list[0].getBoundingClientRect();
-          return rect.left;
+          return 0;
         } else {
           for(var i = 0; i < list_len; i++) {
             list[i].style.left = pos + "px";
@@ -812,8 +830,7 @@ var xjs = (function() {
         
       if(list_len > 0) {
         if(typeof(pos) != "number") {
-          var rect = list[0].getBoundingClientRect();
-          return rect.top;
+          return 0;
         } else {
           for(var i = 0; i < list_len; i++) {
             list[i].style.top = pos + "px";
@@ -824,46 +841,12 @@ var xjs = (function() {
       return list;
     };
     
-    objs.right = function(pos) {
-      var list = this, list_len = list.length;
-        
-      if(list_len > 0) {
-        if(typeof(pos) != "number") {
-          var rect = list[0].getBoundingClientRect();
-          return rect.right;
-        } else {
-          for(var i = 0; i < list_len; i++) {
-            list[i].style.right = pos + "px";
-          }
-        }
-      }
-
-      return list;
-    };
-    
-    objs.bottom = function(pos) {
-      var list = this, list_len = list.length;
-        
-      if(list_len > 0) {
-        if(typeof(pos) != "number") {
-          var rect = list[0].getBoundingClientRect();
-          return rect.bottom;
-        } else {
-          for(var i = 0; i < list_len; i++) {
-            list[i].style.bottom = pos + "px";
-          }
-        }
-      }
-
-      return list;
-    };
-    
     objs.width = function(pos) {
       var list = this, list_len = list.length;
         
       if(list_len > 0) {
         if(typeof(pos) != "number") {
-          return list[0].clientWidth;
+          return 0;
         } else {
           for(var i = 0; i < list_len; i++) {
             list[i].style.width = pos + "px";
@@ -879,7 +862,7 @@ var xjs = (function() {
         
       if(list_len > 0) {
         if(typeof(pos) != "number") {
-          return list[0].clientHeight;
+          return 0;
         } else {
           for(var i = 0; i < list_len; i++) {
             list[i].style.height = pos + "px";
@@ -1001,7 +984,6 @@ var xjs = (function() {
     return _extend(obj);
   },
   
-  
   // This function implements the xjs AJAX request
   _xjsAjax = function(params) {
     if(typeof(params) != "object") {
@@ -1056,6 +1038,7 @@ var xjs = (function() {
     map            : _map,
     filter         : _filter,
     size           : _size,
+    keys           : _keys,
     ajax           : _xjsAjax,
     FormData       : (typeof(window.FormData) === 'undefined' ? _FormData : window.FormData),
     setCookie      : _setCookie,
