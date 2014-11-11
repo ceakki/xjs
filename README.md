@@ -41,3 +41,17 @@ Add class to element
 ```js
 xjs.$("#content").addClass("text-red");
 ```
+
+Execute an AJAX request with or without queue. The queue is useful if you want to do some requests in the order they were started.
+```js
+xjs.ajax({
+  url:     '/process.php',
+  type:    'post',
+  data:    'value1=abc&value2=def',
+  success: function(response) {
+    console.log(response);
+  },
+  // uncomment next line if you want to use queue
+  // queue:   true,
+});
+```
